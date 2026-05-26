@@ -1,0 +1,105 @@
+# ============================================
+# .gitignore - Voice AI Mini Robot Edge Impulse
+# ============================================
+
+# === NODE.JS / NPM ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+package-lock.json
+
+# === PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# === JUPYTER NOTEBOOK ===
+.ipynb_checkpoints
+
+# === MÔITRƯỜNG (ENV) ===
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Giữ lại file mẫu
+!.env.example
+!config/.env.example
+
+# === BUILD OUTPUT ===
+/dist
+/build
+/.next
+/out
+
+# === ARDUINO / PLATFORMIO ===
+.pio/
+.pioenvs/
+.piolibdeps/
+*.elf
+*.hex
+*.bin
+*.map
+
+# === DATASET LỚN (> 100MB) ===
+# Không push dataset âm thanh lớn
+edge-impulse/dataset/raw-audio/*.wav
+edge-impulse/dataset/processed/
+# Ngoại lệ: giữ lại file mẫu nhỏ
+!edge-impulse/dataset/raw-audio/sample_*.wav
+
+# === MODEL (export từ Edge Impulse) ===
+# Chỉ push file .h đã được optimize, không push zip lớn
+edge-impulse/model/*.zip
+
+# === LOGS ===
+server/logs/
+*.log
+logs/
+
+# === IDE / EDITOR ===
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.DS_Store
+Thumbs.db
+
+# === HỆ ĐIỀU HÀNH ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# === TEMPORARY FILES ===
+*.tmp
+*.temp
+*.bak
+*.swp
+*.cache
+
+# === COVERAGE / TEST REPORT ===
+coverage/
+.nyc_output/
+htmlcov/
+.coverage
+.pytest_cache/
