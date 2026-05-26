@@ -1,6 +1,6 @@
 # 🤖 Voice AI Mini Robot với Edge Impulse
 
-> **Đề tài:** Xây dựng robot mini điều khiển bằng giọng nói – Micro laptop chạy mô hình AI (Edge Impulse) nhận dạng lệnh thoại, gửi lệnh qua USB Serial đến ESP32 để điều khiển động cơ.
+> **Đề tài:** Xây dựng robot mini điều khiển bằng giọng nói – ESP32 tích hợp mô hình TinyML (Edge Impulse C++ Library) để nhận dạng từ khóa trực tiếp trên thiết bị, sau đó điều khiển động cơ tương ứng mà **không cần kết nối Internet hay máy tính ngoài**.
 
 ---
 
@@ -18,63 +18,58 @@
 
 ## 📋 Mô tả đề tài
 
-Dự án xây dựng một **robot mini điều khiển bằng giọng nói** theo kiến trúc hai tầng:
+Dự án xây dựng một **robot mini điều khiển bằng giọng nói** theo kiến trúc **on-device AI** — toàn bộ quá trình nhận dạng giọng nói diễn ra ngay trên ESP32:
 
-1. **Tầng AI (Micro laptop):** Thu âm từ microphone → chạy mô hình Edge Impulse bằng Python → nhận dạng từ khóa → gửi chuỗi lệnh qua cổng **USB Serial**.
-2. **Tầng chấp hành (ESP32):** Đọc lệnh từ Serial → điều khiển **động cơ (motor)** tương ứng.
+1. **ESP32 thu âm** qua microphone (I2S / Analog).
+2. **Chạy mô hình TinyML** được nhúng sẵn (C++ Library từ Edge Impulse) để nhận dạng từ khóa.
+3. **Điều khiển động cơ** (qua Motor Driver) dựa trên kết quả phân loại.
 
 ### 🎙️ Các nhãn lệnh được nhận dạng
 
-| Nhãn | Lệnh gửi qua USB | Hành động robot |
-|------|-----------------|-----------------|
-| `gia ky` | `gk` | Giữ nguyên / chào (tín hiệu nhận dạng thành công) |
-| `di` | `di` | Tiến về phía trước |
-| `dung` | `dung` | Dừng tất cả động cơ |
-| `quay` | `quay` | Quay tại chỗ |
-| `noise` | *(bỏ qua)* | Tiếng ồn nền – không gửi lệnh |
+| Nhãn | Hành động robot |
+|------|-----------------|
+| `gia-ky` | LED / buzzer xác nhận nhận dạng thành công |
+| `di` | Tiến về phía trước |
+| `dung` | Dừng tất cả động cơ |
+| `quay` | Quay tại chỗ |
+| `noise` | Bỏ qua – tiếng ồn nền |
 
-### 🔄 Workflow hệ thống
+### 🔄 Workflow hệ thống (On-Device AI)
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    MICRO LAPTOP                         │
-│                                                         │
-│  🎤 Microphone                                          │
-│      │                                                  │
-│      ▼                                                  │
-│  Python Script (main.py)                                │
-│      │  - Thu âm liên tục (sliding window)              │
-│      │  - Trích đặc trưng MFCC                         │
-│      │  - Chạy mô hình Edge Impulse (.eim)              │
-│      │  - Ngưỡng tin cậy (confidence threshold)         │
-│      │                                                  │
-│      ▼                                                  │
-│  Kết quả nhận dạng:                                     │
-│  "gia ky" / "di" / "dung" / "quay" / "noise"           │
-│      │                                                  │
-│      │  Gửi chuỗi lệnh qua USB Serial (pyserial)       │
-└──────┼──────────────────────────────────────────────────┘
-       │  USB Cable (Serial / COM Port)
-       ▼
-┌─────────────────────────────────────────────────────────┐
-│                      ESP32                              │
-│                                                         │
-│  Serial.read() → parse lệnh                            │
-│      │                                                  │
-│      ├── "di"   → Motor tiến                           │
-│      ├── "dung" → Motor dừng                           │
-│      ├── "quay" → Motor quay                           │
-│      └── "gk"   → LED / buzzer xác nhận               │
-│                                                         │
-│  GPIO → Motor Driver (L298N / L293D) → DC Motors       │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                         ESP32                                │
+│                                                              │
+│  🎤 Microphone (I2S INMP441 / MAX9814)                      │
+│      │                                                       │
+│      ▼                                                       │
+│  Thu âm liên tục (sliding window 1s, stride 250ms)           │
+│      │                                                       │
+│      ▼                                                       │
+│  Edge Impulse C++ Inferencing SDK                            │
+│      │  - Trích đặc trưng MFE (Mel Filterbank Energy)       │
+│      │  - Chạy mô hình TFLite (EON Compiled, INT8)          │
+│      │  - Confidence threshold: 0.6                          │
+│      │                                                       │
+│      ▼                                                       │
+│  Kết quả phân loại (5 nhãn):                                 │
+│  "gia-ky" / "di" / "dung" / "quay" / "noise"               │
+│      │                                                       │
+│      ├── "di"    → Motor Driver → Tiến thẳng               │
+│      ├── "dung"  → Motor Driver → Dừng                     │
+│      ├── "quay"  → Motor Driver → Quay                     │
+│      ├── "gia-ky"→ LED / buzzer xác nhận                   │
+│      └── "noise" → Bỏ qua, không làm gì                   │
+│                                                              │
+│  GPIO → Motor Driver (L298N / L293D) → DC Motors            │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 **Công nghệ sử dụng:**
-- 🧠 **Edge Impulse** – Huấn luyện mô hình nhận dạng từ khóa (Keyword Spotting)
-- 🐍 **Python** – Chạy mô hình AI, giao tiếp Serial trên laptop
-- 🔧 **ESP32** – Vi điều khiển nhận lệnh và điều khiển motor
-- 🔌 **USB Serial** – Kênh giao tiếp giữa laptop và ESP32
+- 🧠 **Edge Impulse Studio** – Huấn luyện mô hình nhận dạng từ khóa (Keyword Spotting)
+- ⚡ **EON Compiler** – Tối ưu và biên dịch mô hình thành C++ chạy trên MCU
+- 🔧 **ESP32** – Vi điều khiển chạy toàn bộ pipeline AI + điều khiển motor
+- 🏎️ **TFLite INT8 (compiled)** – Mô hình được lượng tử hoá và biên dịch sẵn
 
 ---
 
@@ -84,23 +79,21 @@ Dự án xây dựng một **robot mini điều khiển bằng giọng nói** th
 voice-ai-mini-robot-edge-impulse/
 │
 ├── firmware/                        # Mã nguồn chạy trên ESP32
-│   ├── src/                         # File .ino / .cpp chính (đọc Serial → điều khiển motor)
-│   ├── include/                     # Header files (.h)
-│   ├── lib/                         # Thư viện ngoài
-│   └── platformio/                  # Cấu hình PlatformIO (platformio.ini)
+│   ├── src/                         # File .ino / .cpp chính (thu âm → AI inference → motor)
+│   ├── include/                     # Header files (.h) của dự án
+│   ├── platformio/                  # Cấu hình PlatformIO (platformio.ini)
+│   └── lib/                         # ⚡ Edge Impulse C++ Library (export từ Studio)
+│       ├── edge-impulse-sdk/        #    SDK inferencing (DSP, classifier, CMSIS...)
+│       ├── model-parameters/        #    model_metadata.h, model_variables.h
+│       ├── tflite-model/            #    Model TFLite đã biên dịch (EON Compiled INT8)
+│       └── CMakeLists.txt           #    Build script cho CMake
 │
-├── edge-impulse/                    # Tất cả liên quan đến AI Model
+├── edge-impulse/                    # Tất cả liên quan đến quá trình huấn luyện AI
 │   ├── dataset/
 │   │   ├── raw-audio/               # File âm thanh gốc (.wav) – 5 nhãn: gia-ky, di, dung, quay, noise
 │   │   └── processed/               # Dữ liệu đã qua tiền xử lý
-│   ├── model/                       # Model export từ Edge Impulse (.eim cho Linux/Mac, .zip)
-│   └── notebooks/                   # Jupyter Notebook phân tích dữ liệu / kiểm thử mô hình
-│
-├── python/                          # Script Python chạy trên Micro laptop
-│   ├── main.py                      # Script chính: thu âm → AI → gửi Serial
-│   ├── classifier.py                # Wrapper gọi mô hình Edge Impulse (.eim)
-│   ├── serial_sender.py             # Module giao tiếp USB Serial (pyserial)
-│   └── requirements.txt             # Danh sách thư viện Python cần cài
+│   ├── model/                       # Tài liệu model (EDGE_IMPULSE_README.txt, link project)
+│   └── notebooks/                   # Jupyter Notebook phân tích dữ liệu / kiểm thử
 │
 ├── docs/                            # Tài liệu dự án
 │   ├── diagrams/                    # Sơ đồ hệ thống, luồng dữ liệu
@@ -124,11 +117,10 @@ voice-ai-mini-robot-edge-impulse/
 
 ### Yêu cầu hệ thống
 
-- **OS (Laptop):** Windows 10/11, macOS 12+, hoặc Ubuntu 20.04+
-- **Python:** >= 3.9
-- **Arduino IDE:** >= 2.x hoặc PlatformIO (để nạp firmware ESP32)
-- **Edge Impulse CLI:** `npm install -g edge-impulse-cli`
-- **Phần cứng:** Micro laptop + ESP32 + Motor Driver (L298N/L293D) + DC Motors + Cáp USB
+- **OS (máy tính để nạp firmware):** Windows 10/11, macOS 12+, hoặc Ubuntu 20.04+
+- **Arduino IDE:** >= 2.x hoặc **PlatformIO** (khuyến nghị)
+- **Edge Impulse CLI** *(chỉ dùng khi thu thập dữ liệu)*: `npm install -g edge-impulse-cli`
+- **Phần cứng:** ESP32 + Microphone (I2S INMP441 hoặc MAX9814) + Motor Driver (L298N/L293D) + DC Motors
 
 ---
 
@@ -141,53 +133,45 @@ cd voice-ai-mini-robot-edge-impulse
 
 ---
 
-### 2️⃣ Cài đặt Python (chạy AI trên laptop)
+### 2️⃣ Cấu hình PlatformIO
 
-```bash
-cd python
-pip install -r requirements.txt
+Mở file `firmware/platformio/platformio.ini` và chỉnh thông số board:
+```ini
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+
+; Thêm Edge Impulse library từ thư mục lib/
+lib_extra_dirs = lib
 ```
 
-**Cấu hình COM Port** – mở `config/config.yaml` và chỉnh:
-```yaml
-serial:
-  port: "COM3"        # Windows: COMx | Linux: /dev/ttyUSB0 | Mac: /dev/cu.usbserial-x
-  baudrate: 115200
-
-model:
-  path: "../edge-impulse/model/model.eim"
-  confidence_threshold: 0.7   # Chỉ gửi lệnh khi độ tin cậy >= 70%
-```
-
-**Chạy chương trình AI:**
-```bash
-python main.py
-```
-
-> 🎤 Chương trình sẽ liên tục lắng nghe microphone. Khi phát hiện từ khóa với độ tin cậy đủ cao, chuỗi lệnh tương ứng được gửi tự động qua USB Serial đến ESP32.
+> ⚠️ Toàn bộ mô hình AI đã được nhúng vào `firmware/lib/` — **không cần cài thêm thư viện nào** từ Library Manager.
 
 ---
 
 ### 3️⃣ Nạp Firmware lên ESP32
 
-**Cách 1: Arduino IDE**
-1. Mở Arduino IDE → `File > Open` → chọn `firmware/src/main.ino`
-2. Vào `Tools > Board` → chọn **ESP32 Dev Module**
-3. Vào `Tools > Port` → chọn đúng COM Port của ESP32
-4. Nhấn **Upload**
-
-**Cách 2: PlatformIO**
+**Cách 1: PlatformIO (khuyến nghị)**
 ```bash
 cd firmware
 pio run --target upload
+pio device monitor    # Xem log Serial để kiểm tra kết quả nhận dạng
 ```
 
-**Lệnh Serial mà ESP32 nhận và xử lý:**
+**Cách 2: Arduino IDE**
+1. Mở Arduino IDE → `File > Open` → chọn `firmware/src/main.ino`
+2. Vào `Sketch > Include Library > Add .ZIP Library` → thêm từng thư mục trong `firmware/lib/`
+3. Vào `Tools > Board` → chọn **ESP32 Dev Module**
+4. Chọn đúng `Port` → nhấn **Upload**
+
+**Sau khi upload**, mở Serial Monitor (115200 baud) — ESP32 sẽ in:
 ```
-"di"   → Chạy motor tiến
-"dung" → Dừng tất cả motor
-"quay" → Quay tại chỗ
-"gk"   → Tín hiệu xác nhận (LED/buzzer)
+[EI] Listening...
+[EI] Detected: di     (0.92)
+[EI] Detected: dung   (0.87)
+[EI] Detected: gia-ky (0.81)
 ```
 
 ---
@@ -213,20 +197,27 @@ Vào [studio.edgeimpulse.com](https://studio.edgeimpulse.com) để:
 
 ## 📦 Phụ thuộc (Dependencies)
 
-### Python – Laptop (AI + Serial)
-| Package | Phiên bản | Mô tả |
-|---------|-----------|-------|
-| edge-impulse-linux | latest | Chạy mô hình `.eim` trên laptop |
-| pyserial | >= 3.5 | Giao tiếp USB Serial với ESP32 |
-| pyaudio | >= 0.2.13 | Thu âm từ microphone |
-| numpy | >= 1.24 | Xử lý mảng số |
-| librosa | >= 0.10 | Phân tích âm thanh (tùy chọn) |
+### Firmware – ESP32
+| Thư viện | Nguồn | Mô tả |
+|---------|-------|-------|
+| **edge-impulse-sdk** | `firmware/lib/` | SDK inferencing của Edge Impulse (DSP + TFLite) |
+| **model-parameters** | `firmware/lib/` | Header tham số mô hình (metadata, labels, variables) |
+| **tflite-model** | `firmware/lib/` | Model TFLite đã biên dịch bằng EON Compiler (INT8) |
+| Arduino ESP32 core | Board Manager | Core lõi cho ESP32 (`espressif32`) |
 
-### Firmware – ESP32 (Arduino)
-| Thư viện | Phiên bản | Mô tả |
-|---------|-----------|-------|
-| Arduino ESP32 core | >= 2.x | Core cho ESP32 |
-| *(không cần thư viện AI)* | – | AI chạy hoàn toàn trên laptop |
+> ✅ Tất cả thư viện AI đã có sẵn trong repo — **không cần tải thêm** từ Internet.
+
+### Thông số mô hình
+| Thông số | Giá trị |
+|---------|---------|
+| Project ID | 1003610 |
+| Owner | GiaKy |
+| Số nhãn | 5 (gia-ky, di, dung, quay, noise) |
+| Tần số lấy mẫu | 16.000 Hz |
+| Cửa sổ dữ liệu | 1.000 ms |
+| Confidence threshold | 0.6 |
+| Engine | TFLite INT8 (EON Compiled) |
+| Arena size | 6.265 bytes |
 
 ---
 
