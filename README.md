@@ -6,13 +6,9 @@
 
 ## 👥 Thành viên nhóm
 
-| STT | Họ và Tên | MSSV | Vai trò |
-|-----|-----------|------|---------|
-| 1   | Nguyễn Văn A | 21xxxxxxx | Nhóm trưởng – AI Model & Python |
-| 2   | Trần Thị B   | 21xxxxxxx | Firmware ESP32 & Motor |
-| 3   | Lê Văn C     | 21xxxxxxx | Thu thập dữ liệu & Tài liệu |
-
-> ⚠️ **Lưu ý:** Thay thế thông tin thành viên thực tế vào bảng trên.
+| STT | Họ và Tên | MSSV |
+|-----|-----------|------|
+| 1   | Thái Gia Kỳ | N23DCCI038 |
 
 ---
 
