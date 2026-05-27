@@ -82,21 +82,12 @@ voice-ai-mini-robot-edge-impulse/
 │
 ├── edge-impulse/                    # 📊 Liên quan đến huấn luyện AI
 │   ├── dataset/
-│   │   ├── raw-audio/              # File âm thanh gốc (.wav)
-│   │   └── processed/              # Dữ liệu đã qua tiền xử lý
-│   ├── model/                      # Tài liệu model (EDGE_IMPULSE_README.txt)
-│   └── notebooks/                  # Jupyter Notebook phân tích dữ liệu
+│   │   ├── training/              # 321 samples huấn luyện (.json)
+│   │   ├── testing/               # 79 samples kiểm thử (.json)
+│   │   ├── info.labels            # Metadata labels
+│   │   └── README.txt             # Hướng dẫn import dataset
+│   └── model/                      # Tài liệu model (EDGE_IMPULSE_README.txt)
 │
-├── docs/                            # 📄 Tài liệu dự án
-│   ├── diagrams/                   # Sơ đồ hệ thống
-│   ├── images/                     # Ảnh chụp phần cứng, demo
-│   └── reports/                    # Báo cáo đề tài
-│
-├── server/                          # 🖥️ Server (nếu cần monitoring)
-├── web/                             # 🌐 Web interface (nếu cần dashboard)
-├── scripts/                         # 🛠️ Script tiện ích
-├── config/                          # ⚙️ Cấu hình chung
-├── tests/                           # 🧪 Bộ kiểm thử
 ├── .gitignore                       # Danh sách file không push lên git
 └── README.md                        # File này
 ```
