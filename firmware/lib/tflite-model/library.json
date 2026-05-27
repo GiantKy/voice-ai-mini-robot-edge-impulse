@@ -1,0 +1,16 @@
+{
+    "name": "tflite-model",
+    "version": "1.0.0",
+    "build": {
+        "flags": [
+            "-Ilib",
+            "-Ilib/edge-impulse-sdk",
+            "-Ilib/edge-impulse-sdk/third_party/flatbuffers/include",
+            "-Ilib/edge-impulse-sdk/third_party/gemmlowp",
+            "-Ilib/edge-impulse-sdk/third_party/ruy",
+            "-Ilib/edge-impulse-sdk/CMSIS/Core/Include",
+            "-Ilib/edge-impulse-sdk/CMSIS/DSP/Include"
+        ],
+        "srcFilter": ["+<*.cpp>"]
+    }
+}

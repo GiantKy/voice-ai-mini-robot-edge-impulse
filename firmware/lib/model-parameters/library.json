@@ -1,0 +1,13 @@
+{
+    "name": "model-parameters",
+    "version": "1.0.0",
+    "build": {
+        "flags": [
+            "-Ilib",
+            "-Ilib/edge-impulse-sdk",
+            "-Ilib/edge-impulse-sdk/third_party/flatbuffers/include",
+            "-Ilib/edge-impulse-sdk/CMSIS/Core/Include",
+            "-Ilib/edge-impulse-sdk/CMSIS/DSP/Include"
+        ]
+    }
+}

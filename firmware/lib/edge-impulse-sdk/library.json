@@ -1,0 +1,46 @@
+{
+    "name": "edge-impulse-sdk",
+    "version": "1.93.4",
+    "build": {
+        "flags": [
+            "-Ilib",
+            "-Ilib/edge-impulse-sdk",
+            "-Ilib/edge-impulse-sdk/CMSIS/Core/Include",
+            "-Ilib/edge-impulse-sdk/CMSIS/DSP/Include",
+            "-Ilib/edge-impulse-sdk/third_party/flatbuffers/include",
+            "-Ilib/edge-impulse-sdk/third_party/gemmlowp",
+            "-Ilib/edge-impulse-sdk/third_party/ruy"
+        ],
+        "srcFilter": [
+            "+<classifier/*.cpp>",
+            "+<dsp/**/*.cpp>",
+            "+<porting/arduino/*.cpp>",
+            "+<tensorflow/**/*.cc>",
+            "+<tensorflow/**/*.cpp>",
+            "-<porting/ambiq/>",
+            "-<porting/android/>",
+            "-<porting/brickml/>",
+            "-<porting/ceva-npn/>",
+            "-<porting/clib/>",
+            "-<porting/espressif/>",
+            "-<porting/ethos-core-driver/>",
+            "-<porting/himax/>",
+            "-<porting/himax-we2/>",
+            "-<porting/iar/>",
+            "-<porting/infineon-psoc62/>",
+            "-<porting/mbed/>",
+            "-<porting/mingw32/>",
+            "-<porting/particle/>",
+            "-<porting/posix/>",
+            "-<porting/raspberry/>",
+            "-<porting/renesas-ra/>",
+            "-<porting/seeed-vision-ai/>",
+            "-<porting/silabs/>",
+            "-<porting/sony/>",
+            "-<porting/stm32-cubeai/>",
+            "-<porting/synaptics/>",
+            "-<porting/ti/>",
+            "-<porting/zephyr/>"
+        ]
+    }
+}
