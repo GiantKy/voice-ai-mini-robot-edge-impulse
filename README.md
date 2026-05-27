@@ -338,4 +338,4 @@ Dự án phục vụ mục đích học thuật – Học kỳ cuối năm học
 
 ---
 
-*© 2026 – Nhóm Voice AI Mini Robot | Trường Đại học ...*
+*© 2026 – Voice AI Mini Robot | Học viện Công Nghệ Bưu Chính Viễn Thông cơ sở TP.HCM*
