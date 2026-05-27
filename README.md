@@ -37,7 +37,7 @@ Dự án xây dựng một **robot mini điều khiển bằng giọng nói** th
 |                     ESP32 (Dual Core)                     |
 |                                                           |
 |  [Core 0] - Audio Capture                                 |
-|  Mic INMP441 (I2S) -> 16kHz, 32-bit -> shift 16-bit      |
+|  Mic INMP441 (I2S) -> 16kHz, 32-bit -> shift 16-bit       |
 |      -> Slice buffer (4000 samples = 250ms)               |
 |                                                           |
 |  [Core 1] - AI Inference + Motor Control                  |
