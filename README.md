@@ -33,25 +33,25 @@ Dự án xây dựng một **robot mini điều khiển bằng giọng nói** th
 ### 🔄 Workflow hệ thống (On-Device AI)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         ESP32 (Dual Core)                   │
-│                                                             │
-│  [Core 0] — Audio Capture                                   │
-│  🎤 INMP441 (I2S) → 16kHz, 32-bit → shift 16-bit            │    
-│      → Slice buffer (4000 samples = 250ms)                  │
-│                                                             │
-│  [Core 1] — AI Inference + Motor Control                    │
-│  Slice buffer → MFCC (13 cepstral, 32 filters)              │
-│      → TFLite INT8 (EON Compiled) → 5 nhãn                  │
-│      │                                                      │
-│      ├── "Di"    → Motor Driver → Tiến thẳng                │
-│      ├── "Dung"  → Motor Driver → Dừng                      │
-│      ├── "Quay"  → Motor Driver → Quay tại chỗ              │
-│      ├── "GiaKy" → Buzzer beep + LED nhấp nháy              │
-│      └── "Noise" → Bỏ qua                                   │
-│                                                             │
-│  GPIO → Motor Driver (L298N) → 2x DC Motors                 │
-└─────────────────────────────────────────────────────────────┘
++-----------------------------------------------------------+
+|                     ESP32 (Dual Core)                     |
+|                                                           |
+|  [Core 0] - Audio Capture                                 |
+|  Mic INMP441 (I2S) -> 16kHz, 32-bit -> shift 16-bit      |
+|      -> Slice buffer (4000 samples = 250ms)               |
+|                                                           |
+|  [Core 1] - AI Inference + Motor Control                  |
+|  Slice buffer -> MFCC (13 cepstral, 32 filters)           |
+|      -> TFLite INT8 (EON Compiled) -> 5 nhan              |
+|      |                                                    |
+|      +-- "Di"    -> Motor Driver -> Tien thang            |
+|      +-- "Dung"  -> Motor Driver -> Dung                  |
+|      +-- "Quay"  -> Motor Driver -> Quay tai cho          |
+|      +-- "GiaKy" -> Buzzer beep + LED nhap nhay           |
+|      +-- "Noise" -> Bo qua                                |
+|                                                           |
+|  GPIO -> Motor Driver (L298N) -> 2x DC Motors             |
++-----------------------------------------------------------+
 ```
 
 **Công nghệ sử dụng:**
