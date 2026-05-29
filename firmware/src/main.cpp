@@ -253,7 +253,7 @@ void setup()
     Serial.println("╚══════════════════════════════════════╝");
     Serial.println();
 
-    // LED & Buzzer
+    // LED ngoài & Buzzer
     pinMode(LED_PIN, OUTPUT);
     pinMode(BUZZER_PIN, OUTPUT);
     digitalWrite(LED_PIN, LOW);

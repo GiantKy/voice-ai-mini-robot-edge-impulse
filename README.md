@@ -102,7 +102,7 @@ voice-ai-mini-robot-edge-impulse/
 | **INMP441** | Microphone I2S | Digital, chất lượng cao cho voice recognition |
 | **L298N** | Motor Driver | Điều khiển 2 động cơ DC |
 | **2x DC Motor** | Động cơ bánh xe | 3-6V |
-| **LED** | Đèn trạng thái | Dùng LED tích hợp GPIO2 |
+| **LED ngoài** | Đèn trạng thái | LED 3mm/5mm + điện trở 220Ω, nối GPIO5 |
 | **Buzzer** | Còi báo hiệu | Active buzzer 3.3V |
 | **Nguồn** | Pin / adapter | 7-12V cho L298N, 3.3V cho ESP32 |
 
@@ -125,11 +125,13 @@ L/R ──────────── GND (kênh trái)
                  GPIO 13 ─────────── IN4  (Motor B)
                  GPIO 15 ─────────── ENB  (PWM Motor B)
 
-                 GPIO 2  ─────────── LED (tích hợp)
+                 GPIO 5  ─────────── LED ngoài (qua điện trở 220Ω)
                  GPIO 4  ─────────── Buzzer
 ```
 
 > 💡 Chỉnh sửa pin trong file `firmware/include/config.h` nếu nối dây khác.
+>
+> ⚠️ LED ngoài cần nối **điện trở 220Ω** nối tiếp giữa GPIO 5 và chân Anode của LED. Chân Cathode nối GND.
 
 ---
 
@@ -175,8 +177,8 @@ Mở `firmware/include/config.h` và sửa pin theo sơ đồ nối dây thực 
 #define MOTOR_IN4_PIN   13
 #define MOTOR_ENB_PIN   15
 
-// LED & Buzzer
-#define LED_PIN         2
+// LED ngoài & Buzzer
+#define LED_PIN         5
 #define BUZZER_PIN      4
 ```
 

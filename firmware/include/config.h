@@ -24,7 +24,7 @@
 #define MOTOR_ENB_PIN       15      // PWM tốc độ
 
 // ---------- LED & Buzzer ----------
-#define LED_PIN             2       // LED tích hợp trên ESP32
+#define LED_PIN             5       // LED ngoài (không dùng LED tích hợp GPIO2)
 #define BUZZER_PIN          4
 
 // ---------- Motor PWM ----------
